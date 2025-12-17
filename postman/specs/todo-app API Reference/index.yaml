@@ -1,0 +1,355 @@
+openapi: 3.0.0
+info:
+  title: todo-app API Reference
+  version: 1.0.0
+  description: >-
+    Complete API reference for the TODO application built with Node.js and
+    Express.
+
+
+    ## Overview
+
+    This is a RESTful API for managing TODO items with full CRUD operations. The
+    API uses an in-memory data store and returns JSON responses.
+
+
+    ## Base URL
+
+    `http://localhost:3000`
+
+
+    ## Response Format
+
+    All responses follow a consistent format:
+
+    ```json
+
+    {
+      "success": true/false,
+      "data": {...},
+      "error": "error message" // only present on errors
+    }
+
+    ```
+
+
+    ## TODO Object Structure
+
+    ```json
+
+    {
+      "id": 1,
+      "title": "Task title",
+      "description": "Task description",
+      "completed": false,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+
+    ```
+
+
+    ## Error Handling
+
+    - 400: Bad Request (validation errors)
+
+    - 404: Not Found (TODO doesn't exist)
+
+    - 500: Internal Server Error
+servers:
+  - url: http://localhost:3000
+paths:
+  /:
+    get:
+      summary: Get API Information
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  endpoints:
+                    type: object
+                    properties:
+                      GET /todos:
+                        type: string
+                      GET /todos/:id:
+                        type: string
+                      POST /todos:
+                        type: string
+                      PUT /todos/:id:
+                        type: string
+                      DELETE /todos/:id:
+                        type: string
+              example:
+                message: Welcome to TODO API
+                endpoints:
+                  GET /todos: Get all TODOs
+                  GET /todos/:id: Get a specific TODO
+                  POST /todos: Create a new TODO
+                  PUT /todos/:id: Update a TODO
+                  DELETE /todos/:id: Delete a TODO
+      tags:
+        - API Info
+      description: Returns welcome message and list of available endpoints
+  /todos:
+    get:
+      summary: Get All TODOs
+      responses:
+        '200':
+          description: Success - Empty List
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items: {}
+              example:
+                success: true
+                data: []
+      tags:
+        - TODOs
+      description: Retrieves a list of all TODO items in the system
+    post:
+      summary: Create TODO
+      responses:
+        '201':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      title:
+                        type: string
+                      description:
+                        type: string
+                      completed:
+                        type: boolean
+                      createdAt:
+                        type: string
+                        format: date-time
+              example:
+                success: true
+                data:
+                  id: 1
+                  title: Buy groceries
+                  description: Milk, eggs, bread
+                  completed: false
+                  createdAt: '2024-01-15T10:30:00.000Z'
+        '400':
+          description: Validation Error - Missing Title
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+              example:
+                success: false
+                error: Title is required
+      tags:
+        - TODOs
+      description: >-
+        Creates a new TODO item. Title is required, description and completed
+        status are optional.
+  /todos/{id}:
+    get:
+      summary: Get TODO by ID
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      title:
+                        type: string
+                      description:
+                        type: string
+                      completed:
+                        type: boolean
+                      createdAt:
+                        type: string
+                        format: date-time
+              example:
+                success: true
+                data:
+                  id: 1
+                  title: Buy groceries
+                  description: Milk, eggs, bread
+                  completed: false
+                  createdAt: '2024-01-15T10:30:00.000Z'
+        '404':
+          description: TODO Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+              example:
+                success: false
+                error: TODO not found
+      tags:
+        - TODOs
+      description: Retrieves a specific TODO item by its ID
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The ID of the TODO item to delete
+        schema:
+          type: integer
+        example: '1'
+    put:
+      summary: Update TODO
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      title:
+                        type: string
+                      description:
+                        type: string
+                      completed:
+                        type: boolean
+                      createdAt:
+                        type: string
+                        format: date-time
+                      updatedAt:
+                        type: string
+                        format: date-time
+              example:
+                success: true
+                data:
+                  id: 1
+                  title: Buy groceries - Updated
+                  description: Milk, eggs, bread
+                  completed: true
+                  createdAt: '2024-01-15T10:30:00.000Z'
+                  updatedAt: '2024-01-15T15:30:00.000Z'
+        '400':
+          description: Validation Error - Empty Title
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+              example:
+                success: false
+                error: Title cannot be empty
+        '404':
+          description: TODO Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+              example:
+                success: false
+                error: TODO not found
+      tags:
+        - TODOs
+      description: >-
+        Updates an existing TODO item. All fields are optional - only provided
+        fields will be updated.
+    delete:
+      summary: Delete TODO
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      title:
+                        type: string
+                      description:
+                        type: string
+                      completed:
+                        type: boolean
+                      createdAt:
+                        type: string
+                        format: date-time
+              example:
+                success: true
+                data:
+                  id: 1
+                  title: Buy groceries
+                  description: Milk, eggs, bread
+                  completed: false
+                  createdAt: '2024-01-15T10:30:00.000Z'
+        '404':
+          description: TODO Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+              example:
+                success: false
+                error: TODO not found
+      tags:
+        - TODOs
+      description: Permanently deletes a TODO item by its ID
